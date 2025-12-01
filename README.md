@@ -1,4 +1,5 @@
-# Mini-LISP Interpreter 期末專案
+# Comopiler final project 
+其實basic好像只要看最後一個檔案就好
 
 ## todo 
 
