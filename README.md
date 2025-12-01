@@ -1,9 +1,9 @@
 # Comopiler final project 
 其實basic好像只要看最後一個檔案就好
 
-q2-4: 同一份檔案
+q2-8: 同一份檔案
 ## todo 
-
+- [ ] 生隱藏測資
 
 
 ## 專案目標
