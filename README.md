@@ -1,56 +1,227 @@
-# 2025_compiler_final
-邊義氣期末專題
+# Mini-LISP Interpreter 期末專案
 
-## 總目標：實作一個 Mini-LISP 直譯器
-### 📌 一、必要功能（Basic Features）
-- [ ] 1. 語法驗證（10 分）
+## todo 
 
-遇到語法不合法要印出 "syntax error"。
-Public test 01 就是在測這個（見 public_test_data_ans 第 1 頁）。
 
-- [ ] 2. print-num / print-bool（10 分）
 
-(print-num EXP) 印整數
-(print-bool EXP) 印 #t 或 #f
-MiniLisp.pdf 第 3 頁 grammar 明確定義 print 語法。
+## 專案目標
+建立一個 Mini-LISP 直譯器，能夠解析並執行 Mini-LISP 程式。
 
-- [ ] 3. 數值運算（25 分）
+---
 
-你必須完整支援以下語法（MiniLisp.pdf 第 1～5 頁）：
-+ 可變長度（多個參數）
-- 僅兩個參數
-* 可變長度
-/ 僅兩個參數（整數除法，類似 C++）
-mod > < =
+## 專案資源
+- 語言規格文件 (Language Specifications)
+- 標準直譯器 `smli` 供測試比對
+- Mini-LISP 程式範例
+- 公開測試案例與隱藏測試案例
 
-- [ ] 4. 邏輯運算（25 分）
+### 執行標準直譯器
+```bash
+./smli example.lsp
+```
 
-支援：
-and（多參數）
-or（多參數）
-not（單參數）
+---
 
-- [ ] 5. if 表達式（8 分）
+## 基本任務
+1. 閱讀 Mini-LISP 語言規格
+2. 執行範例程式以理解語言行為
+3. 實作 Mini-LISP 直譯器的各項功能
 
-格式：(if TEST THEN ELSE)
-TEST 必須為 boolean（若你沒做 type checking 可以不檢查）
+---
 
-- [ ] 6. 變數定義（8 分）
+## 基本功能 (必須完成 1-4 才能繼續其他功能)
 
-(define x EXP)
-不能重複定義（MiniLisp.pdf 第 6 頁）
-使用靜態作用域：函數內定義的變數不影響外面
+### Feature 1: 語法驗證 (10 分)
+- **描述**: 當解析到無效語法時，印出 "syntax error"
+- **測試案例**: 2 公開 + 2 隱藏
+- **配分**: 公開 80% + 隱藏 20%
 
-- [ ] 7. 匿名函數（fun）（8 分）
+### Feature 2: Print 實作 (10 分)
+- **描述**: 實作 `print-num` 和 `print-bool` 語句
+- **範例**:
+  ```lisp
+  (print-num 123)  ; 輸出: 123
+  (print-bool #t)  ; 輸出: #t
+  ```
 
-語法（MiniLisp.pdf 第 6 頁）：
-(fun (a b ...) body)
-呼叫：((fun (x) (+ x 1)) 3) → 4
-功能包含：
-建立 function object（閉包部分是 bonus）
-呼叫時綁定參數
+### Feature 3: 數值運算 (25 分)
+- **描述**: 實作所有數值運算子
+- **運算子**:
+  - `+` 加法 (支援多個參數)
+  - `-` 減法 (兩個參數)
+  - `*` 乘法 (支援多個參數)
+  - `/` 除法 (整數除法)
+  - `mod` 模除
+  - `>` 大於
+  - `<` 小於
+  - `=` 等於 (支援多個參數)
+- **範例**:
+  ```lisp
+  (+ 1 2 3 4)      ; 10
+  (- 5 3)          ; 2
+  (* 2 3 4)        ; 24
+  (/ 10 3)         ; 3
+  (mod 10 3)       ; 1
+  (> 5 3)          ; #t
+  ```
 
-- [ ] 8. 具名函數（6 分）
+### Feature 4: 邏輯運算 (25 分)
+- **描述**: 實作所有邏輯運算子
+- **運算子**:
+  - `and` 邏輯且 (支援多個參數)
+  - `or` 邏輯或 (支援多個參數)
+  - `not` 邏輯非
+- **範例**:
+  ```lisp
+  (and #t #t #f)   ; #f
+  (or #f #f #t)    ; #t
+  (not #f)         ; #t
+  ```
 
-(define f (fun (x) ...))
-(f 3) 要能正常運作
+### Feature 5: if 表達式 (8 分)
+- **描述**: 實作條件表達式
+- **語法**: `(if TEST-EXP THEN-EXP ELSE-EXP)`
+- **範例**:
+  ```lisp
+  (if (> 3 2) 10 20)  ; 10
+  (if #f 1 2)         ; 2
+  ```
+
+### Feature 6: 變數定義 (8 分)
+- **描述**: 能夠定義變數
+- **語法**: `(define VARIABLE EXP)`
+- **範例**:
+  ```lisp
+  (define x 5)
+  (+ x 1)  ; 6
+  ```
+- **注意**: 不允許重複定義
+
+### Feature 7: 匿名函式 (8 分)
+- **描述**: 能夠宣告和呼叫匿名函式
+- **語法**: `(fun (params) body)`
+- **範例**:
+  ```lisp
+  ((fun (x) (+ x 1)) 2)  ; 3
+  ```
+
+### Feature 8: 具名函式 (6 分)
+- **描述**: 能夠宣告和呼叫具名函式
+- **範例**:
+  ```lisp
+  (define foo (fun (x y) (+ x y)))
+  (foo 2 3)  ; 5
+  ```
+
+---
+
+## 進階功能 (Bonus)
+
+### Bonus 1: 遞迴 (5 分)
+- **描述**: 支援遞迴函式呼叫
+- **範例** (階乘函式):
+  ```lisp
+  (define f
+    (fun (x) 
+      (if (= x 1)
+          1
+          (* x (f (- x 1))))))
+  (f 4)  ; 24
+  ```
+
+### Bonus 2: 型別檢查 (5 分)
+- **描述**: 檢測型別錯誤並印出錯誤訊息
+- **型別規則**:
+  | 運算子 | 參數型別 | 回傳型別 |
+  |--------|----------|----------|
+  | +, -, *, /, mod | Number | Number |
+  | >, <, = | Number | Boolean |
+  | and, or, not | Boolean | Boolean |
+  | if | Boolean (test) | 依分支而定 |
+- **範例**:
+  ```lisp
+  (> 1 #t)
+  ; 輸出: Type Error: Expect 'number' but got 'boolean'.
+  ```
+
+### Bonus 3: 巢狀函式 (5 分)
+- **描述**: 支援函式內部定義函式 (靜態作用域)
+- **語法**: `fun-body ::= def-stmt* exp`
+- **範例**:
+  ```lisp
+  (define dist-square
+    (fun (x y)
+      (define square (fun (x) (* x x)))
+      (+ (square x) (square y))))
+  ```
+
+### Bonus 4: 一級函式 (5 分)
+- **描述**: 函式可作為參數傳遞，支援閉包 (Closure)
+- **範例 1** (函式作為參數):
+  ```lisp
+  (define chose
+    (fun (chose-fun x y)
+      (if (chose-fun x y) x y)))
+  (chose (fun (x y) (> x y)) 2 1)  ; 2
+  ```
+- **範例 2** (閉包):
+  ```lisp
+  (define add-x
+    (fun (x)
+      (fun (y) (+ x y))))
+  (define f (add-x 5))
+  (f 3)  ; 8
+  ```
+
+---
+
+## 語言規格摘要
+
+### 資料型別
+- **Boolean**: `#t` (true), `#f` (false)
+- **Number**: 32 位元有號整數 (-2³¹ ~ 2³¹-1)
+- **Function**: 函式物件
+
+### 詞法規則
+```
+number  ::= 0 | [1-9][0-9]* | -[1-9][0-9]*
+ID      ::= [a-z]([a-z]|[0-9]|'-')*
+bool-val ::= #t | #f
+```
+
+### 保留字
+所有運算子都是保留字，不可用作變數名稱：
+`+`, `-`, `*`, `/`, `mod`, `>`, `<`, `=`, `and`, `or`, `not`, `define`, `fun`, `if`, `print-num`, `print-bool`
+
+---
+
+## 實作建議
+
+### 開發流程
+1. ✅ **先完成 Feature 1-4** (這是前置要求)
+2. ✅ 依序實作 Feature 5-8
+3. ✅ 通過所有公開測試案例
+4. ✅ 挑戰進階功能 (Bonus)
+
+### 測試策略
+- 每個功能有 2 個公開測試 + 2 個隱藏測試
+- 公開測試佔 80%，隱藏測試佔 20%
+- 通過公開測試通常就能通過隱藏測試
+
+### 工具選擇
+- **推薦**: 使用 Lex 和 Yacc
+- **允許**: 使用其他語言和工具
+
+---
+
+## 總分配置
+- **基本功能**: 100 分
+- **進階功能**: 20 分 (Bonus)
+- **總計**: 最高 120 分
+
+---
+
+## 重要提醒
+⚠️ **必須先完成 Feature 1-4 才能繼續其他功能**
+⚠️ **不允許重複定義變數**
+⚠️ **所有運算都使用前綴表示法（括號包圍）**
