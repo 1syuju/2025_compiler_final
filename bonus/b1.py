@@ -636,11 +636,9 @@ def main():
             evaluator.eval(stmt)
         
     except Exception as e:
-        # lexer 出錯時會 raise "syntax error"
         if str(e) == "syntax error":
             print("syntax error")
         else:
-            # 其它錯誤目前都不特別處理（之後做 type error / 變數錯誤再加）
             pass
         sys.exit(0)
 
