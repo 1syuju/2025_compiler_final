@@ -1,25 +1,18 @@
 # Comopiler final project 
-其實basic好像只要看最後一個檔案就好
 
-q2-8: 同一份檔案
-## todo 
-- [ ] 生隱藏測資
-
-
-## 專案目標
 建立一個 Mini-LISP 直譯器，能夠解析並執行 Mini-LISP 程式。
+language: python
 
 ---
 
-## 專案資源
-- 語言規格文件 (Language Specifications)
-- 標準直譯器 `smli` 供測試比對
-- Mini-LISP 程式範例
-- 公開測試案例與隱藏測試案例
+## file struture
+`\basic` : all basic requirements
+`\bonus` : all basic + bonus requirements
+`public_test_data` : pubilc test data
 
-### 執行標準直譯器
+### run file
 ```bash
-./smli example.lsp
+python bonus\b4.py public_test_data\test.lsp
 ```
 
 ---
@@ -197,33 +190,11 @@ bool-val ::= #t | #f
 
 ---
 
-## 實作建議
-
-### 開發流程
-1. ✅ **先完成 Feature 1-4** (這是前置要求)
-2. ✅ 依序實作 Feature 5-8
-3. ✅ 通過所有公開測試案例
-4. ✅ 挑戰進階功能 (Bonus)
-
-### 測試策略
-- 每個功能有 2 個公開測試 + 2 個隱藏測試
-- 公開測試佔 80%，隱藏測試佔 20%
-- 通過公開測試通常就能通過隱藏測試
-
-### 工具選擇
-- **推薦**: 使用 Lex 和 Yacc
-- **允許**: 使用其他語言和工具
-
----
-
-## 總分配置
-- **基本功能**: 100 分
-- **進階功能**: 20 分 (Bonus)
-- **總計**: 最高 120 分
-
----
-
 ## 重要提醒
 ⚠️ **必須先完成 Feature 1-4 才能繼續其他功能**
 ⚠️ **不允許重複定義變數**
 ⚠️ **所有運算都使用前綴表示法（括號包圍）**
+
+
+
+
