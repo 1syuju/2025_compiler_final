@@ -1,12 +1,12 @@
 import sys
 from typing import List, Union, Any, Dict
 
-# ==================== Lexer ====================
+# python basic\q1.py public_test_data\01_1.lsp
 
 class Token:
     def __init__(self, type, value=None):
-        self.type = type
-        self.value = value
+        self.type = type    # %token<> PLUS MINUS
+        self.value = value  #"+" "-"
     
     def __repr__(self):
         return f"Token({self.type}, {self.value})"
@@ -18,8 +18,10 @@ class Lexer:
         self.current_char = self.text[0] if text else None
     
     def error(self):
+        # 錯誤時拋出異常
         raise Exception("syntax error")
     
+    # 移動到下一個字元
     def advance(self):
         self.pos += 1
         if self.pos >= len(self.text):
@@ -31,6 +33,7 @@ class Lexer:
         while self.current_char and self.current_char in ' \t\n\r':
             self.advance()
     
+    # number ::= 0 | [1-9]digit* | -[1-9]digit*
     def number(self):
         result = ''
         if self.current_char == '-':
@@ -40,7 +43,6 @@ class Lexer:
         if self.current_char is None or not self.current_char.isdigit():
             self.error()
         
-        # 允許 0 或 [1-9][0-9]*
         if self.current_char == '0':
             result += '0'
             self.advance()
@@ -51,6 +53,8 @@ class Lexer:
         
         return int(result)
     
+    # ID ::= letter (letter | digit | ‘-’)*
+    # Examples: x, y, john, cat-food
     def id_or_keyword(self):
         result = ''
         while self.current_char and (self.current_char.isalnum() or self.current_char == '-'):
@@ -58,11 +62,14 @@ class Lexer:
             self.advance()
         return result
     
+    # 檢查它是否為 Mini-LISP 的關鍵字
     def get_keyword_or_id(self, text):
+
+        # "+" { return PLUS; }  
         keywords = {
             'print-num': 'PRINT_NUM',
             'print-bool': 'PRINT_BOOL',
-            '+': 'PLUS',
+            '+': 'PLUS',  
             '-': 'MINUS',
             '*': 'MULTIPLY',
             '/': 'DIVIDE',
@@ -81,6 +88,7 @@ class Lexer:
         token_type = keywords.get(text, 'ID')
         return Token(token_type, text)
     
+    # 根據 current_char 的內容決定下一個 Token 是什麼
     def get_next_token(self):
         while self.current_char:
             if self.current_char in ' \t\n\r':
@@ -106,7 +114,7 @@ class Lexer:
                 else:
                     self.error()
             
-            # 數字或負數
+            # 數字或負號
             if self.current_char == '-':
                 # -[0-9] 開頭當作負數
                 if self.pos + 1 < len(self.text) and self.text[self.pos + 1].isdigit():
@@ -119,7 +127,7 @@ class Lexer:
             if self.current_char.isdigit():
                 return Token('NUMBER', self.number())
             
-            # 單一字元運算子：+ * / < > =
+            # + * / < > =
             if self.current_char in '+*/<>=':
                 ch = self.current_char
                 self.advance()
@@ -135,6 +143,7 @@ class Lexer:
         
         return Token('EOF', None)
     
+    # 收集成一個列表並回傳
     def tokenize(self):
         tokens = []
         while True:
@@ -144,8 +153,7 @@ class Lexer:
                 break
         return tokens
 
-# ==================== Parser ====================
-
+# AST : Grammar Overview
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -170,14 +178,14 @@ class Parser:
             self.error()
     
     def parse(self):
-        """PROGRAM ::= STMT+"""
+        """ PROGRAM ::= STMT+ """
         stmts = []
         while self.current_token.type != 'EOF':
             stmts.append(self.stmt())
         return stmts
     
     def stmt(self):
-        """STMT ::= EXP | DEF-STMT | PRINT-STMT"""
+        """ STMT ::= EXP | DEF-STMT | PRINT-STMT """
         if self.current_token.type == 'LPAREN':
             # 需要 lookahead 判斷是哪種 statement
             saved_pos = self.pos
@@ -199,7 +207,7 @@ class Parser:
             return self.exp()
     
     def print_stmt(self):
-        """PRINT-STMT ::= (print-num EXP) | (print-bool EXP)"""
+        """ PRINT-STMT ::= (print-num EXP) | (print-bool EXP) """
         self.expect('LPAREN')
         if self.current_token.type == 'PRINT_NUM':
             self.advance()
@@ -374,7 +382,6 @@ class Parser:
         
         return ('fun', params, body)
 
-# ==================== Evaluator ====================
 
 class Environment:
     """環境：用於儲存變數綁定"""
@@ -407,17 +414,17 @@ class Environment:
             raise Exception(f"Undefined variable: {name}")
 
 class Evaluator:
-    """評估器：執行 AST"""
+    """AST"""
     def __init__(self):
         self.global_env = Environment()
     
-    # ---- C++ style 除法 / 餘數 ----
+    # ---- 除法 / 餘數 ----
     def c_div(self, a: int, b: int) -> int:
         if b == 0:
             raise Exception("division by zero")
-        # C/C++ 是 trunc toward zero
-        q = abs(a) // abs(b)
-        if (a < 0) ^ (b < 0):
+        
+        q = abs(a) // abs(b)    
+        if (a < 0) ^ (b < 0):   # a 和 b 符號不同
             q = -q
         return q
     
@@ -427,14 +434,14 @@ class Evaluator:
         return a - self.c_div(a, b) * b
 
     def eval(self, node, env=None):
-        """評估節點"""
+        
         if env is None:
             env = self.global_env
         
         if not isinstance(node, tuple):
             raise Exception("Invalid AST node")
         
-        node_type = node[0]
+        node_type = node[0] 
         
         # 基本值
         if node_type == 'number':
@@ -511,55 +518,43 @@ class Evaluator:
         if node_type == 'call':
             return self.eval_call(node, env)
         
-        raise Exception(f"Unknown node type: {node_type}")
-    
-    # -------- 数值运算实现 --------
+        raise Exception(f"Unknown node type: {node_type}")    
 
     def eval_plus(self, exps, env):
-        """加法：至少 2 個參數"""
         result = 0
         for exp in exps:
             result += self.eval(exp, env)
         return result
     
     def eval_minus(self, exps, env):
-        """減法：恰好 2 個參數"""
         return self.eval(exps[0], env) - self.eval(exps[1], env)
     
     def eval_multiply(self, exps, env):
-        """乘法：至少 2 個參數"""
         result = 1
         for exp in exps:
             result *= self.eval(exp, env)
         return result
     
     def eval_divide(self, exps, env):
-        """除法：恰好 2 個參數，C++ style 整數除法"""
         a = self.eval(exps[0], env)
         b = self.eval(exps[1], env)
         return self.c_div(a, b)
     
     def eval_mod(self, exps, env):
-        """模除：恰好 2 個參數，C++ style 餘數"""
         a = self.eval(exps[0], env)
         b = self.eval(exps[1], env)
         return self.c_mod(a, b)
     
     def eval_greater(self, exps, env):
-        """大於：恰好 2 個參數"""
         return self.eval(exps[0], env) > self.eval(exps[1], env)
     
     def eval_smaller(self, exps, env):
-        """小於：恰好 2 個參數"""
         return self.eval(exps[0], env) < self.eval(exps[1], env)
     
     def eval_equal(self, exps, env):
-        """等於：至少 2 個參數，所有值都相等"""
         values = [self.eval(exp, env) for exp in exps]
         first = values[0]
         return all(v == first for v in values)
-    
-    # -------- 邏輯運算 / if / 函式 --------
 
     def eval_and(self, exps, env):
         for exp in exps:
@@ -585,7 +580,11 @@ class Evaluator:
     
     def eval_call(self, node, env):
         func = self.eval(node[1], env)
-        args = [self.eval(arg, env) for arg in node[2]]
+
+        # 參數列表
+        # (add (+ 1 1) 3): (+ 1 1) = 2，再計算 3 得到 3。
+        # args 變數會變成列表 [2, 3]
+        args = [self.eval(arg, env) for arg in node[2]] 
         
         if not isinstance(func, tuple) or func[0] != 'closure':
             raise Exception("Not a function")
@@ -597,12 +596,11 @@ class Evaluator:
         if len(params) != len(args):
             raise Exception(f"Expected {len(params)} arguments, got {len(args)}")
         
+        # 將「參數名稱」與「實際數值」配對，並寫入 new_env
         for param, arg in zip(params, args):
             new_env.define(param, arg)
         
         return self.eval(body, new_env)
-
-# ==================== Main ====================
 
 def main():
     if len(sys.argv) > 1:
