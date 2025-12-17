@@ -7,7 +7,9 @@ language: python
 
 ## file struture
 `\basic` : all basic requirements
+
 `\bonus` : all basic + bonus requirements
+
 `public_test_data` : pubilc test data
 
 ### run file
