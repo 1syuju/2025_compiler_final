@@ -1,6 +1,7 @@
 # Comopiler final project 
 
-建立一個 Mini-LISP 直譯器，能夠解析並執行 Mini-LISP 程式。
+建立一個 Mini-LISP 直譯器，能夠解析並執行 Mini-LISP 程式
+
 language: python
 
 ---
